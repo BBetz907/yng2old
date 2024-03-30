@@ -136,7 +136,23 @@ kp <- df |> rbind(hts) |> rbind(kp_prev) |>
   relocate(value, .after = q) |> 
   arrange(indicator)
 
-write_csv(kp, "Dataout/young_kp_for_tableau.csv")
+
+# Mechanism Info ----------------------------------------------------------
+mech <- readxl::read_xlsx(path = "Data/EpiC KP mechanism types and approaches.xlsx") |> 
+  janitor::clean_names() |> 
+  rename(model_dic_oss = epi_c_report_does_mechanism_feature_drop_in_centers_or_one_stop_shops,
+         model_other_community = epi_c_report_other_community_model,
+         model_moh = epi_c_report_mechanism_run_entirely_through_the_public_moh_system
+         ) |> 
+  select(country, model_dic_oss, model_other_community, model_moh) |>
+  filter(model_dic_oss == "Yes", model_moh == "Yes") |> 
+  print()
+
+kp_model <- kp |> left_join(mech) |> glimpse()
+# Write data for Tableau --------------------------------------------------
+
+
+write_csv(kp_model, "Dataout/young_kp_for_tableau.csv")
 
 
 
